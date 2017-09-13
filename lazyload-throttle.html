@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>函数节流版懒加载</title>
+  <style>
+    img {
+      display: block;
+      margin-bottom: 200px;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+  <img src="pic/giphy-downsized.gif" data-src="pic/hack_day.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/ncuhome_diary.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/old_ncuhomers_talk.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/blog_default.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/ncuos.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/iNCU.png">
+  <img src="pic/giphy-downsized.gif" data-src="pic/weixin_qq.jpg">
+  <script>
+  function throttle (fn, delay, least) {
+    var timeout = null,
+        startTime = new Date()
+    return function () {
+      var curTime = new Date()
+      clearTimeout(timeout)
+      if (curTime - startTime >= least) {
+        fn()
+        startTime = curTime
+      } else {
+        timeout = setTimeout(fn, delay)
+      }
+    }
+  }
+
+  function lazyload() {
+    var images = document.getElementsByTagName('img');
+    var len    = images.length;
+    var n      = 0;      //存储图片加载到的位置，避免每次都从第一张图片开始遍历   
+    return function() {
+      var seeHeight = document.documentElement.clientHeight;
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      for(var i = n; i < len; i++) {
+        if(images[i].offsetTop < seeHeight + scrollTop) {
+          if(images[i].getAttribute('src') === 'pic/giphy-downsized.gif') {
+           images[i].src = images[i].getAttribute('data-src');
+          }
+          n = n + 1;
+        }
+      }
+    }
+  }
+  var loadImages = lazyload();
+  loadImages();  //初始化首页的页面图片
+  window.addEventListener('scroll', throttle(loadImages, 500, 1000), false);
+  </script>
+</body>
+</html>
